@@ -1,4 +1,4 @@
-Request For Comments on m.js
+Request For Comments
 ----
 
 > the M of Model View Controller
