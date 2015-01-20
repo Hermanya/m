@@ -12,7 +12,7 @@ Request For Comments
 
 var m = require('m.js')
 
-m.user.id(2).groups.get().then(/**/)
+m.user.id(2).groups.get().then(/* value of GET /user/2/groups */)
 m('get user ' + 2 + ' groups').then(/**/)
 m(`get user #{2} groups`).then(/**/) // ES6
 m.get('user', 2, 'groups').then(/**/)
@@ -30,8 +30,8 @@ m.get(m.user.id(2, 'groups')).thenAndWhenUpdated(/**/)
 ```javascript
 import {get, user, users, groups} from 'm.js'
 
-get( user.id(2).groups ).then(/**/)
-get( users({email: 'herman@uxp'}) ).then(/**/) // any execution by `get` of whatever triggers `whenUpdated`
+get( user({email: 'herman@uxp'}) ).then(/* value of GET /user?email=herman@uxp */)
+get( users.id(2).groups ).then(/* */) // any execution by `get` of whatever triggers `whenUpdated`
 users({email: 'herman@uxp'}).whenUpdated(/**/) // listen to update events
 get( users({email: 'herman@uxp'}) ).thenAndFromNowOnWhenUpdated(/**/) // or you can do both
 ```
