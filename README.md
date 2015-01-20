@@ -5,6 +5,8 @@ Request For Comments
 
 > the S of Store View Action Dispatcher
 
+> when it's all RESTful 
+
 #Client
 ```javascript
 
