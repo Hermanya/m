@@ -30,7 +30,7 @@ m.get(m.user.id(2, 'groups')).thenAndWhenUpdated(/**/)
 ```javascript
 import {get, user, users, groups} from 'm.js'
 
-get( users({email: 'herman@uxp'}) ).then(/* value of GET /user?email=herman@uxp */)
+get( users({email: 'herman@uxp'}) ).then(/* value of GET /users?email=herman@uxp */)
 get( user.withId(2).groups ).then(/* */) // any execution by `get` of whatever triggers `whenUpdated`
 users({email: 'herman@uxp'}).whenUpdated(/**/) // listen to update events
 get( users({email: 'herman@uxp'}) ).thenAndFromNowOnWhenUpdated(/**/) // or you can do both
