@@ -88,3 +88,4 @@ It would be weird if you would not want to generate your backend based on a conf
 - generating boilerplate handlers and validators
 - generating mocks for known datatypes (like email) for development
 - support new datatypes (simply provide your mock function)
+- client side validation based on the same scheme
