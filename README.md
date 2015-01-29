@@ -5,7 +5,7 @@ Request For Comments
 
 > the S of Store View Action Dispatcher
 
-> when it's all RESTful 
+> when it's all RESTful
 
 #Client
 ```javascript
@@ -45,7 +45,7 @@ import m from 'm.js';
 function main () {
   m.collections = ['users' /*implied singular user*/, {singular: 'group', plural: 'groups'}]
   m.urlPrefix = 'platform/rest/37/'
-  m.isBackendSupported = false // true by default, otherwise local persistance only 
+  m.isBackendSupported = false // true by default, otherwise local persistance only
   // rest of your program
 }
 ```
@@ -89,3 +89,11 @@ It would be weird if you would not want to generate your backend based on a conf
 - generating mocks for known datatypes (like email) for development
 - support new datatypes (simply provide your mock function)
 - client side validation based on the same scheme
+
+
+
+
+-----------------------
+
+- all resource objects have a property url, which identifies the resource. It is ment to be unique across all the objects.
+- outdated flag if cache expired, followed by fresh data
