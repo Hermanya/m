@@ -1,7 +1,7 @@
 var validate = require('./validate.js'),
 ajax = require('./ajax.js');
 
-module.exports = function m (url, data) {
+function m (url, data) {
   var w = Object.create(m),
       method = getMethodFromString(url);
   w.url = url;
@@ -12,62 +12,69 @@ module.exports = function m (url, data) {
   }
   return w;
 };
+module.exports = m;
 
-m.methods = ['get', 'post', 'put', 'delete'];
 m.initialize = function (maybeAPI) {
   m.api = maybeAPI || {};
-  defineMethods();
-  defineMethodsWithSingularForms();
-  definePluralForms();
-  defineSingularForms();
+  Object.keys(m.api.resources).forEach(function (resource) {
+    definePluralForm(resource);
+    defineSingularForm(resource);
+  });
 };
+m.init = m.initialize;
 
-function defineSingularForms () {
-  m.api.resources.forEach(function (resource) {
-    m[resource] = function (data) {
-      var id = data,
-          url = this.url || '';
-      url += '/' + resource;
-      if (typeof data === 'object') {
-        id = data.id;
-      }
-      if (id) {
-        url += '/' + id;
-      }
-      return m(url, this.data || data);
-    };
+function defineSingularForm (resource) {
+  m[resource] = function (data) {
+    var id = data,
+        url = this.url || '';
+    url += '/' + resource;
+    if (typeof data === 'object') {
+      id = data.id;
+    } else {
+      data = undefined;
+    }
+    if (id) {
+      url += '/' + id;
+    }
+    var model = m(url, this.data || data);
+    decoratePluralForms(model);
+    return model;
+  };
+  m[resource].url = '/' + resource;
+  Object.keys(m).forEach(function (key) {
+    m[resource][key] = m[key];
   });
 }
 
-function definePluralForms () {
-  m.api.resources.forEach(function (resource) {
-    m.api.resources.map(function (resource) {
-      return resource + 's';
-    }).forEach(function (pluralFormOfResource) {
-      m[pluralFormOfResource] = function (data) {
-        return m((this.url || '') + '/' + pluralFormOfResource, this.data || data);
-      };
-    });
+function decoratePluralForms (request) {
+  Object.keys(m.api.resources).forEach(function (resource) {
+    var pluralForm = plural(resource);
+    // Object.keys(m).forEach(function (key) {
+    //   request[pluralForm] = m[key];
+    // });
+    request[pluralForm].url = request.url + '/' + pluralForm;
+    request[pluralForm].data = request.data;
   });
 }
 
-function defineMethodsWithSingularForms () {
+function definePluralForm (resource) {
+  var pluralForm = plural(resource);
+  m[pluralForm] = function (data) {
+    var url = (this.url || '') + '/' + pluralForm;
+    return m(url, this.data || data);
+  };
+}
+
+m.methods = ['get', 'post', 'put', 'delete'];
+decorateWithMethods(m);
+
+function decorateWithMethods (object) {
   m.methods.forEach(function (method) {
-    m.api.resources.forEach(function (resource) {
-      m[method + capitalize(resource)] = function (id) {
-        m[method](m('/' + resource + '/' + id));
-      };
-    });
-  });
-}
-
-function definetMethods () {
-  m.methods.forEach(function (method) {
-    m[method] = function (maybeRequest) {
+    object[method] = function (maybeRequest) {
       var request = maybeRequest || this,
       url = m.api.prefix + request.url,
       data = request.data || {};
-      return ajax(method, url, data);
+  //  return ajax(method, url, data);
     };
   });
 }
@@ -88,4 +95,8 @@ function getUrlFromString (string) {
 
 function capitalize (string) {
   return string.charAt(0).toUpperCase() + string.substring(1);
+}
+
+function plural (singularForm) {
+  return singularForm + 's';
 }

@@ -7,7 +7,7 @@ module.exports = function validate (pattern, value) {
 };
 
 function createAllValidations (pattern) {
-  return pattern.split('or').map(function (subpattern) {
+  return pattern.split(/\s+or\s+/).map(function (subpattern) {
     return createValidations(subpattern);
   });
 }
