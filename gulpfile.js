@@ -20,7 +20,7 @@ gulp.task('clean', function() {
 
 gulp.task('bundle', ['clean'], function() {
   return browserify({
-    entries: ['./src/main.js'],
+    entries: ['./src/backbone-m-for-uxp.js'],
     standalone: 'm'
   })
   .bundle()

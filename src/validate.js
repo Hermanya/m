@@ -25,6 +25,9 @@ function throwTypeUnknown (pattern) {
 }
 
 var typeChecks = {
+  'any': function () {
+    return true;
+  },
   'url': function (value) {
     return typeChecks.string(value);
   },

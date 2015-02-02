@@ -1,100 +1,90 @@
-var validate = require('./validate.js'),
-ajax = require('./ajax.js');
+var M;
+module.exports = M = {};
 
-function m (url, data) {
-  var w = Object.create(m),
-      method = getMethodFromString(url);
-  w.url = url;
-  w.data = data;
-  if (method) {
-    w.url = getUrlFromString(url.replace(method, ''));
-    return w[method]();
-  }
-  return w;
+M.mapOverResourceTypes = function (callback, m) {
+  m = m || this;
+  return Object.keys(m.api.resources).map(callback);
 };
-module.exports = m;
 
-m.initialize = function (maybeAPI) {
+M.create = function (maybeAPI) {
+  var m = Object.create(M);
   m.api = maybeAPI || {};
-  Object.keys(m.api.resources).forEach(function (resource) {
-    definePluralForm(resource);
-    defineSingularForm(resource);
-  });
+  M.mapOverResourceTypes(function (resourceType) {
+    decorateWithPluralFormMethods(resourceType, m);
+    decorateWithSingularFormMethods(resourceType, m);
+  }, m);
+  M.apiListeners.map(function (f) {f(m);});
+  return m;
 };
-m.init = m.initialize;
 
-function defineSingularForm (resource) {
-  m[resource] = function (data) {
-    var id = data,
-        url = this.url || '';
-    url += '/' + resource;
-    if (typeof data === 'object') {
-      id = data.id;
-    } else {
-      data = undefined;
+M.apiListeners = [];
+
+
+function decorateWithSingularFormMethods (resource, m) {
+  m[resource] = function (maybeId) {
+    var state = Object.create(m);
+
+    state.urlFragments = (state.urlFragments || [m.api.prefix]).concat([resource]);
+    state.resourceType = resource;
+
+    function appendId (id) {
+      state.id = id;
+      state.urlFragments.push(id);
     }
-    if (id) {
-      url += '/' + id;
+
+    var strategy = {
+      number: appendId,
+      string: appendId,
+      undefined: function () {/* fall through */}
+    } [typeof maybeId] || throwInvalidArgument;
+
+    strategy(maybeId);
+
+    function throwInvalidArgument () {
+      throw new Error('This function only accepts a string or a number id.');
     }
-    var model = m(url, this.data || data);
-    decoratePluralForms(model);
-    return model;
+
+    return state;
   };
-  m[resource].url = '/' + resource;
-  Object.keys(m).forEach(function (key) {
-    m[resource][key] = m[key];
-  });
 }
 
-function decoratePluralForms (request) {
-  Object.keys(m.api.resources).forEach(function (resource) {
-    var pluralForm = plural(resource);
-    // Object.keys(m).forEach(function (key) {
-    //   request[pluralForm] = m[key];
-    // });
-    request[pluralForm].url = request.url + '/' + pluralForm;
-    request[pluralForm].data = request.data;
-  });
-}
-
-function definePluralForm (resource) {
+function decorateWithPluralFormMethods (resource, m) {
   var pluralForm = plural(resource);
-  m[pluralForm] = function (data) {
-    var url = (this.url || '') + '/' + pluralForm;
-    return m(url, this.data || data);
+  m[pluralForm] = function (maybeQuery) {
+    var state = Object.create(this);
+
+    state.urlFragments = (state.urlFragments || [m.api.prefix]).concat([pluralForm]);
+    state.resourceType = resource;
+    state.isPlural = true;
+
+    var strategy = {
+      object: function (query) {
+        state.urlFragments.push('?' + serialize(query));
+      },
+      undefined: function () {/* fall through */}
+    } [typeof maybeQuery] || throwInvalidArgument;
+
+    strategy(maybeQuery);
+
+    function throwInvalidArgument () {
+      throw new Error('This function only accepts a plain old javascript query object.');
+    }
+
+    return state;
   };
 }
 
-m.methods = ['get', 'post', 'put', 'delete'];
-decorateWithMethods(m);
-
-function decorateWithMethods (object) {
-  m.methods.forEach(function (method) {
-    object[method] = function (maybeRequest) {
-      var request = maybeRequest || this,
-      url = m.api.prefix + request.url,
-      data = request.data || {};
-  //  return ajax(method, url, data);
-    };
-  });
-}
-
-function getMethodFromString (string) {
-  return m.methods.filter(function (method) {
-    return string.indexOf(method) === 0;
-  })[0];
-}
-
-function getUrlFromString (string) {
-  return string
-  .split('of').reverse().join(' ')
-  .split('with id').join('')
-  .split(/\s+/).join(' ')
-  .replace(/\s/g, '/');
-}
-
-function capitalize (string) {
-  return string.charAt(0).toUpperCase() + string.substring(1);
+function serialize (object, prefix) {
+  return Object.keys(object).map(function (key) {
+    var value = object[key];
+    if (prefix) {
+      key = prefix + '[' + key + ']';
+    }
+    if (typeof value === 'object') {
+      return serialize(value, key);
+    }
+    return encodeURIComponent(key) + '=' + encodeURIComponent(value);
+  }).join('&');
 }
 
 function plural (singularForm) {
