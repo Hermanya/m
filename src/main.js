@@ -1,12 +1,5 @@
 var M;
-module.exports = M = {};
-
-M.mapOverResourceTypes = function (callback, m) {
-  m = m || this;
-  return Object.keys(m.api.resources).map(callback);
-};
-
-M.create = function (maybeAPI) {
+module.exports = M = function (maybeAPI) {
   var m = Object.create(M);
   m.api = maybeAPI || {};
   M.mapOverResourceTypes(function (resourceType) {
@@ -15,6 +8,11 @@ M.create = function (maybeAPI) {
   }, m);
   M.apiListeners.map(function (f) {f(m);});
   return m;
+};
+
+M.mapOverResourceTypes = function (callback, m) {
+  m = m || this;
+  return Object.keys(m.api.resources).map(callback);
 };
 
 M.apiListeners = [];

@@ -1,5 +1,6 @@
-var Backbone = require('../vendor/backbone.js');
+var Backbone = require('backbone');
 var M = require('./main.js');
+
 
 var cache = {},
 typeToModel = {};
@@ -16,6 +17,7 @@ function decorateWithBackboneMethods (M) {
   for (key in new Backbone.Collection()) {
     decorateWithKey(key, M);
   }
+  decorateWithKey('toBackboneModel', M);
 }
 
 function decorateWithKey(key, M) {
@@ -31,6 +33,9 @@ function decorateWithKey(key, M) {
     } else {
       model = getCollection(this);
     }
+    if (key === 'toBackboneModel') {
+      return model;
+    }
     return model[key].apply(model, arguments);
   };
 }
@@ -44,6 +49,60 @@ M.apiListeners.push(function defineModels (m) {
       urlRoot: m.api.prefix + '/' + resourceType,
       validate: function (/* nextAttributes */) {
         return true;
+      },
+      modelsTiedWith: [],
+      tieTo: function (otherModel) {
+        otherModel.modelsTiedWith.forEach(function (indirectModel) {
+          this.modelsTiedWith.push(indirectModel);
+          indirectModel.modelsTiedWith.push(this);
+        });
+
+        this.modelsTiedWith.push(otherModel);
+        otherModel.modelsTiedWith.push(this);
+      },
+      separateFromOthers: function () {
+        this.modelsTiedWith.forEach(function (otherModel) {
+          var indexOfThis = otherModel.modelsTiedWith.indexOf(this);
+          otherModel.modelsTiedWith.splice(indexOfThis, 1);
+        });
+        this.modelsTiedWith = [];
+      },
+      set : function(key, val, options) {
+        var attrs;//, unset, changes, silent, changing, prev, current;
+        if (!key) {
+          return this;
+        }
+
+        // Handle both `"key", value` and `{key: value}` -style arguments.
+        if (typeof key === 'object') {
+          attrs = key;
+          options = val;
+        } else {
+          (attrs = {})[key] = val;
+        }
+        options = options || {};
+
+
+
+        if (attrs.id !== this.get('id')) {
+
+          this.separateFromOthers();
+
+          var otherModel = cache[m.api.prefix + '/' + resourceType + '/' + attrs.id];
+          if (otherModel) {
+            this.tieTo(otherModel);
+          } else {
+            cache[m.api.prefix + '/' + resourceType + '/' + attrs.id] = this;
+          }
+        }
+
+        if (!options.stopMyPropagation) {
+          this.modelsThisTiedWith.forEach(function (model) {
+            model.set(attrs, {stopMyPropagation: true});
+          });
+        }
+
+        return Backbone.Model.prototype.set.call(this, attrs, options);
       }
     });
   });
@@ -70,14 +129,14 @@ function createCollection (base) {
       return base.url;
     },
     model: function (attributes) {
-      var model, key = prefix + '/' + base.resourceType + '/' + attributes.id; 
+      var model, key = prefix + '/' + base.resourceType + '/' + attributes.id;
       if (attributes.id) {
         model = cache[key];
       }
       if (model) {
         return model;
       } else {
-        model = typeToModel[base.resourceType](attributes);
+        model = new typeToModel[base.resourceType](attributes);
         cache[key] = model;
         return model;
       }
