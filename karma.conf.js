@@ -1,6 +1,7 @@
 // Karma configuration
 // Generated on Sun Feb 08 2015 10:41:24 GMT-0500 (EST)
 
+
 module.exports = function(config) {
   config.set({
 
@@ -15,9 +16,13 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'test-main.js',
+      {pattern: 'node_modules/jquery/dist/jquery.js', included: false},
+      {pattern: 'node_modules/underscore/underscore.js', included: false},
+      {pattern: 'node_modules/backbone/backbone.js', included: false},
       {pattern: 'src/**/*.js', included: false},
-      {pattern: 'test/**/*-test.js', included: false}
+      {pattern: 'test/**/test-*.js', included: false},
+
+      'test/main.js'
     ],
 
 
@@ -58,7 +63,20 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
+
     browsers: ['PhantomJS'],
+
+    // you can define custom flags
+    customLaunchers: {
+      ChromeWithoutSecurity: {
+        base: 'Chrome',
+        flags: ['--disable-web-security']
+      },
+      PhantomJSWithoutSecurity: {
+        base: 'PhantomJS',
+        flags: ['--web-security=false', '--local-to-remote-url-access=true']
+      }
+    },
 
 
     // Continuous Integration mode

@@ -19,6 +19,10 @@
     "trailing": true,
     "smarttabs": true,
     "white": true,
-    "browserify": true,
-    "jasmine": true
+    "jasmine": true,
+    "predef": [
+      "require",
+      "define",
+      "escape"
+    ]
 }
