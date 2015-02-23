@@ -6,8 +6,7 @@ define(['m-for-backbone'], function (M) {
       resources: {
         user: {
           id: 'integer',
-          displayName: 'string',
-          attributes: 'array of objects'
+          displayName: 'string'
         },
         group: 'any',
         account: 'any'
@@ -20,19 +19,16 @@ define(['m-for-backbone'], function (M) {
       me = m.user().toBackboneModel();
       me.set({
         id: 1,
-        name: 'Herman',
-        attributes: []
+        name: 'Herman'
       });
 
-      myHousehold = m.group(1).users().toBackboneModel();
+      myHousehold = m.group(1).users().toBackboneCollection();
       myHousehold.set({
         id: 1,
-        name: 'Herman Starikov',
-        attributes: []
+        name: 'Herman Starikov'
       }, {
         id: 2,
-        name: 'Other Herman',
-        attributes: []
+        name: 'Other Herman'
       });
     });
 

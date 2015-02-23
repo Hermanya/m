@@ -2,7 +2,7 @@ define([
   'backbone',
   'url-mapping'
 ], function (Backbone, M) {
-  var typeToModel = {};
+  var modelConstructorsPerType = {};
 
   decorateWithBackboneMethods(M);
 
@@ -15,34 +15,29 @@ define([
       decorateWithKey(key, M);
     }
     decorateWithKey('toBackboneModel', M);
+    decorateWithKey('toBackboneCollection', M);
   }
 
   function decorateWithKey(key, M) {
-    if (M[key]) {
-      return;
-    }
-
-    M[key] = function proxy () {
+    M[key] = M[key] || function proxy () {
       var model;
       this.url = this.urlFragments.join('/');
-      if (!this.isPlural) {
-        model = getModel(this);
-      } else {
-        model = getCollection(this);
-      }
       if (key === 'toBackboneModel') {
-        return model;
+        return getModel(this);
+      } else if (key === 'toBackboneCollection') {
+        return getCollection(this);
+      } else if (this.isPlural) {
+        model = getCollection(this);
+      } else {
+        model = getModel(this);
       }
       return model[key].apply(model, arguments);
     };
   }
 
-  var prefix; // TODO somehow get rid of this, currently used in createCollection
-
-  M.apiListeners.push(function defineModels (m) {
-    prefix = m.api.prefix;
+  M.initializationSubscribers.push(function defineModels (m) {
     m.mapOverResourceTypes(function (resourceType) {
-      typeToModel[resourceType] = Backbone.Model.extend({
+      modelConstructorsPerType[resourceType] = Backbone.Model.extend({
         urlRoot: m.api.prefix + '/' + resourceType,
         validate: function (/* nextAttributes */) {
           return true;
@@ -53,7 +48,6 @@ define([
             this.modelsTiedWith.push(indirectModel);
             indirectModel.modelsTiedWith.push(this);
           });
-
           this.modelsTiedWith.push(otherModel);
           otherModel.modelsTiedWith.push(this);
         },
@@ -65,12 +59,11 @@ define([
           this.modelsTiedWith = [];
         },
         set : function(key, val, options) {
-          var attrs;
+          var attrs, url, otherModel;
           if (!key) {
             return this;
           }
-
-          // Handle both `"key", value` and `{key: value}` -style arguments.
+       // Handle both `"key", value` and `{key: value}` -style arguments.
           if (typeof key === 'object') {
             attrs = key;
             options = val;
@@ -78,24 +71,20 @@ define([
             (attrs = {})[key] = val;
           }
           options = options || {};
-
-
-
-          if (attrs.id !== this.get('id')) {
-
+          
+	  if (attrs.id !== this.get('id')) {
             this.separateFromOthers();
-
-            var otherModel = m.cache[m.api.prefix + '/' + resourceType + '/' + attrs.id];
+            url = m.api.prefix + '/' + resourceType + '/' + attrs.id;
+	    otherModel = m.cache[url];
             if (otherModel) {
               this.tieTo(otherModel);
             } else {
-              m.cache[m.api.prefix + '/' + resourceType + '/' + attrs.id] = this;
+              m.cache[url] = this;
             }
           }
-
-          if (!options.stopMyPropagation) {
+          if (!options.stopPropagationForM) {
             this.modelsTiedWith.forEach(function (model) {
-              model.set(attrs, {stopMyPropagation: true});
+              model.set(attrs, {stopPropagationForM: true});
             });
           }
           return Backbone.Model.prototype.set.call(this, attrs, options);
@@ -109,7 +98,7 @@ define([
   }
 
   function createModel (m) {
-    m.cache[m.url] = new typeToModel[m.resourceType]({
+    m.cache[m.url] = new modelConstructorsPerType[m.resourceType]({
       id: m.id
     });
     return m.cache[m.url];
@@ -125,7 +114,7 @@ define([
         return m.url;
       },
       model: function (attributes) {
-        var model, key = prefix + '/' + m.resourceType + '/' + attributes.id;
+        var model, key = m.api.prefix + '/' + m.resourceType + '/' + attributes.id;
         if (attributes.id) {
           model = m.cache[key];
         }
@@ -133,7 +122,7 @@ define([
           model.set(attributes);
           return model;
         } else {
-          model = new typeToModel[m.resourceType](attributes);
+          model = new modelConstructorsPerType[m.resourceType](attributes);
           m.cache[key] = model;
           return model;
         }

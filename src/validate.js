@@ -1,11 +1,11 @@
-define([], function () {
+define('validate', [], function () {
   function validate (pattern, value) {
     return createAllValidations(pattern).some(function (validations) {
       return validations.every(function (validation) {
         return validation(value);
       });
     });
-  };
+  }
 
   function createAllValidations (pattern) {
     return pattern.split(/\s+or\s+/).map(function (subpattern) {

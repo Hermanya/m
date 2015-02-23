@@ -7,7 +7,7 @@ define([], function () {
       decorateWithPluralFormMethods(resourceType, m);
       decorateWithSingularFormMethods(resourceType, m);
     }, m);
-    M.apiListeners.map(function (f) {f(m);});
+    M.initializationSubscribers.map(function (f) {f(m);});
     return m;
   };
 
@@ -16,7 +16,7 @@ define([], function () {
     return Object.keys(m.api.resources).map(callback);
   };
 
-  M.apiListeners = [];
+  M.initializationSubscribers = [];
 
   function decorateWithSingularFormMethods (resource, m) {
     m[resource] = function (maybeId) {
