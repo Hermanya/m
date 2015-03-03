@@ -1,4 +1,4 @@
-define(['validate'], function (validate) {
+  var validate = require('../src/validate.js');
   describe('validation', function () {
     it ('is validates integer', function () {
       expect(validate('integer', 2)).toEqual(true);
@@ -7,4 +7,3 @@ define(['validate'], function (validate) {
       expect(validate('array of integers', [2])).toEqual(true);
     });
   });
-});

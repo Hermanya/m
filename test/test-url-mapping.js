@@ -1,4 +1,4 @@
-define(['m-for-backbone'], function (M) {
+  var M = require('../src/m-for-backbone.js');
   describe('Url mapping', function () {
     var m,
     api = {
@@ -32,4 +32,3 @@ define(['m-for-backbone'], function (M) {
       expect(m.user(2).groups(query).url()).toEqual(api.prefix + '/user/2/groups/?limit=2&offset=4');
     });
   });
-});

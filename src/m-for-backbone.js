@@ -1,7 +1,5 @@
-define([
-  'backbone',
-  'url-mapping'
-], function (Backbone, M) {
+  var Backbone = require('backbone');
+  var M = require('./url-mapping.js');
   var modelConstructorsPerType = {};
 
   decorateWithBackboneMethods(M);
@@ -130,5 +128,4 @@ define([
     }))();
     return m.cache[m.url];
   }
-  return M;
-});
+  module.exports = M;

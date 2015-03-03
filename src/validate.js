@@ -1,4 +1,3 @@
-define('validate', [], function () {
   function validate (pattern, value) {
     return createAllValidations(pattern).some(function (validations) {
       return validations.every(function (validation) {
@@ -73,5 +72,4 @@ define('validate', [], function () {
     });
   }
   
-  return validate;
-});
+  module.exports = validate;

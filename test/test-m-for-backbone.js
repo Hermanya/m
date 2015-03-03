@@ -1,4 +1,4 @@
-define(['m-for-backbone'], function (M) {
+  var M = require('../src/m-for-backbone.js');
   describe('Backbone model integration', function () {
     var m, me, myHousehold,
     api = {
@@ -56,5 +56,3 @@ define(['m-for-backbone'], function (M) {
       expect(wasEmited).toBe(true);
     });
   });
-
-});

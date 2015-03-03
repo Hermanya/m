@@ -1,4 +1,3 @@
-define([], function () {
   var M = function (maybeAPI) {
     var m = Object.create(M);
     m.api = maybeAPI || {};
@@ -15,7 +14,6 @@ define([], function () {
     m = m || this;
     return Object.keys(m.api.resources).map(callback);
   };
-
   M.initializationSubscribers = [];
 
   function decorateWithSingularFormMethods (resource, m) {
@@ -88,5 +86,4 @@ define([], function () {
   function plural (singularForm) {
     return singularForm + 's';
   }
-  return M;
-});
+  module.exports = M;
