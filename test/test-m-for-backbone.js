@@ -55,4 +55,5 @@
       me.set('name', 'Emited herman');
       expect(wasEmited).toBe(true);
     });
+
   });

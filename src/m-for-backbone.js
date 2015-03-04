@@ -1,4 +1,4 @@
-  var Backbone = require('backbone');
+  var Backbone = require('backbone') || window.Backbone;
   var M = require('./url-mapping.js');
   var modelConstructorsPerType = {};
 
@@ -38,7 +38,9 @@
       modelConstructorsPerType[resourceType] = Backbone.Model.extend({
         urlRoot: m.api.prefix + '/' + resourceType,
         validate: function (/* nextAttributes */) {
-          return true;
+          if (false) {
+            return 'an error';
+          }
         },
         modelsTiedWith: [],
         tieTo: function (otherModel) {
@@ -69,11 +71,11 @@
             (attrs = {})[key] = val;
           }
           options = options || {};
-          
-	  if (attrs.id !== this.get('id')) {
+
+      	  if (attrs.id && attrs.id !== this.get('id')) {
             this.separateFromOthers();
             url = m.api.prefix + '/' + resourceType + '/' + attrs.id;
-	    otherModel = m.cache[url];
+      	    otherModel = m.cache[url];
             if (otherModel) {
               this.tieTo(otherModel);
             } else {
