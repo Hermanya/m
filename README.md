@@ -4,10 +4,10 @@ Request for Comments
 ###Features
 
 - models with defined ids are singletons
-- once id for the *current* model is defined (ex. on fetch), the model will be tied to the model with same id, if it's defined
+- once id changes (ex. *current* user is fetched) the model will be tied to an existing model with same id
 - collections also point to singleton models, thus sync is free
 - sort of type validation
-- adaptation to other framework's model is posible
+- adaptation to other (than backbone) framework's models is possible
 
 ###How to Use
 
@@ -15,13 +15,18 @@ Request for Comments
 // m-for-my-api.js
 define(['m-for-backbone'], function (m) {
   return M({
-    user: {
-      id: 'number',
-      name: 'string',
-      attributes: 'array of objects',
-      prototype: 'uxp-entity-with-attributes'
-    },
-    group: 'any'
+    prefix: '/rest/v37',
+    resources: {
+      account: 'any',
+      group: 'array of users',
+      user: {
+        id: 'number',
+        name: 'string',
+        email: 'email',
+        attributes: 'array of objects'
+      }
+      
+    }
   });
 });
 
