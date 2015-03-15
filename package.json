@@ -1,40 +1,27 @@
 {
   "name": "m",
   "version": "1.0.0",
-  "description": "Singleton models with Backbone",
+  "description": "Singleton models with Backbone and possibly other frameworks",
   "main": "m.js",
   "directories": {
     "test": "test"
   },
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "backbone": "^1.1.2",
     "browserify": "^5.13.1",
-    "gulp": "^3.5.6",
-    "gulp-clean": "^0.3.1",
-    "gulp-jasmine": "^1.0.1",
     "jasmine-node": "^1.14.5",
     "jquery": "^2.1.3",
-    "karma": "^0.10.10",
-    "karma-chrome-launcher": "^0.1.7",
-    "karma-coffee-preprocessor": "^0.1.3",
-    "karma-coverage": "^0.1.5",
-    "karma-firefox-launcher": "^0.1.4",
-    "karma-html2js-preprocessor": "^0.1.0",
-    "karma-jasmine": "^0.1.5",
-    "karma-phantomjs-launcher": "^0.1.4",
-    "karma-requirejs": "^0.2.2",
-    "karma-script-launcher": "^0.1.0",
-    "requirejs": "^2.1.15",
-    "rimraf": "^2.2.8",
+    "watchify": "^2.4.0",
     "uglify-js": "^2.4.16",
-    "underscore": "^1.7.0",
-    "vinyl-source-stream": "^0.1.1"
+    "underscore": "^1.7.0"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "jasmine-node test/ --matchall --color --autotest --watch `pwd`/src/",
-    "build": "node_modules/browserify/bin/cmd.js src/m-for-backbone.js -s M -x backbone | uglifyjs -c > m.min.js",
-    "watch": "  watchify src/m-for-backbone.js --standalone M --external backbone --debug --verbose  -o m.js"
+    "build": "npm run build:min && npm run build:dev",
+    "build:min": "node_modules/browserify/bin/cmd.js src/m-for-backbone.js -s M -x backbone | uglifyjs -c > m.min.js",
+    "build:dev": "node_modules/browserify/bin/cmd.js src/m-for-backbone.js -s M -x backbone --debug --verbose > m.js",
+    "watch": "watchify src/m-for-backbone.js -s M -x backbone --debug --verbose -o m.js"
   },
   "repository": {
     "type": "git",

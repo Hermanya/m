@@ -42,6 +42,34 @@
             return 'an error';
           }
         },
+        saveOwnAttributes: function () {
+          var ownAttributes = Object.keys(this.attributes).reduce(function (attributes, key) {
+            if (['displayName'].indexOf(key) !== -1) {
+              attributes[key] = this.attributes[key];
+            }
+            return attributes;
+          }.bind(this), {});
+          return Backbone.ajax({
+            type: 'PUT',
+            url: this.url(),
+            contentType: "application/json;charset=utf-8",
+            data: JSON.stringify(ownAttributes)
+          });
+        },
+        saveCustomAttributes: function () {
+          return Backbone.ajax({
+            type: 'POST',
+            url: this.url() + '/attributes',
+            contentType: "application/json;charset=utf-8",
+            data: JSON.stringify(this.get('attributes'))
+          });
+        },
+        save: function () {
+          return Backbone.$.when(
+            this.saveOwnAttributes(),
+            this.saveCustomAttributes()
+          );
+        },
         modelsTiedWith: [],
         tieTo: function (otherModel) {
           otherModel.modelsTiedWith.forEach(function (indirectModel) {
@@ -71,6 +99,31 @@
             (attrs = {})[key] = val;
           }
           options = options || {};
+
+
+
+          var attributeMappings = m.api.resources[resourceType].attributeMappings;
+          if (attributeMappings) {
+            Object.keys(attributeMappings).forEach(function (attributeMapping) {
+              var attributeName = attributeMappings[attributeMapping];
+              if (attrs[attributeMapping] !== undefined) {
+                var attributes = this.get('attributes').filter(function (attribute) {
+                  return attribute.name !== attributeName;
+                });
+
+                attributes.push({
+                  name: attributeName,
+                  value: attrs[attributeMapping]
+                });
+
+                this.set('attributes', attributes);
+              }
+            }.bind(this));
+          }
+
+
+
+
 
       	  if (attrs.id && attrs.id !== this.get('id')) {
             this.separateFromOthers();
