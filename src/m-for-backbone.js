@@ -85,7 +85,26 @@
           });
           this.modelsTiedWith = [];
         },
-        set : function(key, val, options) {
+        get: function(key) {
+
+          var _attributeMappings = m.api.resources[resourceType]._attributeMappings;
+          if (_attributeMappings && _attributeMappings[key]) {
+            var attribute = this.get('attributes').filter(function (attr) {
+              return attr.name === _attributeMappings[key];
+            })[0]
+            var value;
+            if (attribute) {
+              try {
+                value = JSON.parse(attribute.value);
+              } catch (_) {
+                value = attribute.value;
+              }
+            }
+            return value;
+          }
+          return Backbone.Model.prototype.get.call(this, key);
+        },
+        set: function(key, val, options) {
           var attrs, url, otherModel;
           if (!key) {
             return this;
@@ -113,17 +132,20 @@
                   return attribute.name !== attributeName;
                 });
 
+                var value = attrs[attributeMapping];
+                if (typeof value !== 'string') {
+                  value = JSON.stringify(value)
+                }
                 attributes.push({
                   name: attributeName,
-                  value: attrs[attributeMapping]
+                  value: value
                 });
+                delete attrs[attributeMapping]
 
                 this.set('attributes', attributes);
               }
             }.bind(this));
           }
-
-
 
 
 

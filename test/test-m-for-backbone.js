@@ -8,7 +8,8 @@
           id: 'integer',
           displayName: 'string',
           _attributeMappings: {
-            language: 'com.m.lang'
+            language: 'com.m.lang',
+            age: 'com.m.age'
           }
         },
         group: 'any',
@@ -22,7 +23,11 @@
       me = m.user().model();
       me.set({
         id: 1,
-        name: 'Herman'
+        name: 'Herman',
+        attributes: [{
+          name: 'com.m.age',
+          value: '12'
+        }]
       });
 
       myHousehold = m.group(1).users().collection();
@@ -67,12 +72,13 @@
     });
 
     it('set attribute', function () {
+      expect(me.get('language')).toEqual(undefined)
       me.set('language', 'en')
-      expect(me.attributes.language).toEqual('en')
       expect(me.get('language')).toEqual('en')
-      expect(me.attributes.attributes.filter(function (attr) {
-        return attr.name === m.api.resources.user._attributeMappings.language;
-      })[0].value).toEqual('en')
+
+      expect(me.get('age')).toEqual(12)
+      me.set('age', me.get('age') + 3)
+      expect(me.get('age')).toEqual(15)
     });
 
   });
