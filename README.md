@@ -11,7 +11,7 @@ Request for Comments
 
 ###How to Use
 
-```javascript 
+```javascript
 // m-for-my-api.js
 define(['m-for-backbone'], function (m) {
   return M({
@@ -25,24 +25,34 @@ define(['m-for-backbone'], function (m) {
         email: 'email',
         attributes: 'array of objects'
       }
-      
+
     }
   });
 });
 
 ```
 ```javascript
-// current-user-mvwhaterver.js
-var m = require('m-for-my-api.js');
-var me = m.user().toBackboneModel();
-```
-```javascript
 // current-group-mvwhaterver.js
 var m = require('m-for-my-api.js');
-var usersInMyGroup = m.group().users({limit: 10}).toBackboneCollection();
+var usersInMyGroup = m.group().users({limit: 10}).collection();
 ```
 ```javascript
 // selected-user-mvwhaterver.js
 var m = require('m-for-my-api.js');
-var user = m.user(selectedId).toBackboneModel();
+var user = m.user(selectedId).model();
+```
+```javascript
+// current-user-mvwhaterver.js
+var m = require('m-for-my-api.js');
+var me = m.user().model();
+me.set('language', 'ru')
+//  {
+//    id: 1,
+//    name: 'Herman Starikov',
+//    attributes: [{
+//      name: 'com.m.lang',
+//      value: 'ru'
+//    }],
+//    language: 'ru'
+//  }
 ```

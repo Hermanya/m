@@ -1,4 +1,4 @@
-  var Backbone = require('backbone') || window.Backbone;
+  var Backbone = require('backbone');
   var M = require('./url-mapping.js');
   var modelConstructorsPerType = {};
 
@@ -12,17 +12,17 @@
     for (key in new Backbone.Collection()) {
       decorateWithKey(key, M);
     }
-    decorateWithKey('toBackboneModel', M);
-    decorateWithKey('toBackboneCollection', M);
+    decorateWithKey('model', M);
+    decorateWithKey('collection', M);
   }
 
   function decorateWithKey(key, M) {
     M[key] = M[key] || function proxy () {
       var model;
       this.url = this.urlFragments.join('/');
-      if (key === 'toBackboneModel') {
+      if (key === 'model') {
         return getModel(this);
-      } else if (key === 'toBackboneCollection') {
+      } else if (key === 'collection') {
         return getCollection(this);
       } else if (this.isPlural) {
         model = getCollection(this);
@@ -36,7 +36,6 @@
   M.initializationSubscribers.push(function defineModels (m) {
     m.mapOverResourceTypes(function (resourceType) {
       modelConstructorsPerType[resourceType] = Backbone.Model.extend({
-        urlRoot: m.api.prefix + '/' + resourceType,
         validate: function (/* nextAttributes */) {
           if (false) {
             return 'an error';
@@ -107,6 +106,9 @@
             Object.keys(attributeMappings).forEach(function (attributeMapping) {
               var attributeName = attributeMappings[attributeMapping];
               if (attrs[attributeMapping] !== undefined) {
+                if (!this.has('attributes')) {
+                  this.set('attributes', [], {silent: true})
+                }
                 var attributes = this.get('attributes').filter(function (attribute) {
                   return attribute.name !== attributeName;
                 });
@@ -154,6 +156,9 @@
     m.cache[m.url] = new modelConstructorsPerType[m.resourceType]({
       id: m.id
     });
+    m.cache[m.url].url = function () {
+      return m.url;
+    }
     return m.cache[m.url];
   }
 
