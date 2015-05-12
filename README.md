@@ -23,7 +23,10 @@ define(['m-for-backbone'], function (m) {
         id: 'number',
         name: 'string',
         email: 'email',
-        attributes: 'array of objects'
+        attributes: 'array of objects',
+        _attributeMappings: {
+          language: 'com.m.lang'
+        }
       }
 
     }

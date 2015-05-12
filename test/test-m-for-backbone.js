@@ -7,7 +7,7 @@
         user: {
           id: 'integer',
           displayName: 'string',
-          attributeMappings: {
+          _attributeMappings: {
             language: 'com.m.lang'
           }
         },
@@ -71,7 +71,7 @@
       expect(me.attributes.language).toEqual('en')
       expect(me.get('language')).toEqual('en')
       expect(me.attributes.attributes.filter(function (attr) {
-        return attr.name === m.api.resources.user.attributeMappings.language;
+        return attr.name === m.api.resources.user._attributeMappings.language;
       })[0].value).toEqual('en')
     });
 

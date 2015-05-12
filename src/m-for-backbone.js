@@ -101,10 +101,10 @@
 
 
 
-          var attributeMappings = m.api.resources[resourceType].attributeMappings;
-          if (attributeMappings) {
-            Object.keys(attributeMappings).forEach(function (attributeMapping) {
-              var attributeName = attributeMappings[attributeMapping];
+          var _attributeMappings = m.api.resources[resourceType]._attributeMappings;
+          if (_attributeMappings) {
+            Object.keys(_attributeMappings).forEach(function (attributeMapping) {
+              var attributeName = _attributeMappings[attributeMapping];
               if (attrs[attributeMapping] !== undefined) {
                 if (!this.has('attributes')) {
                   this.set('attributes', [], {silent: true})
