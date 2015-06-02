@@ -26,6 +26,9 @@ define(['m-for-backbone'], function (m) {
         attributes: 'array of objects',
         _attributeMappings: {
           language: 'com.m.lang'
+        },
+        _shortcutMappgins: {
+          isAdmin: ['association', 'flags', 'com.m.administrator']
         }
       }
 
@@ -49,6 +52,7 @@ var user = m.user(selectedId).model();
 var m = require('m-for-my-api.js');
 var me = m.user().model();
 me.set('language', 'ru')
+me.set('isAdmin', true)
 //  {
 //    id: 1,
 //    name: 'Herman Starikov',
@@ -56,6 +60,10 @@ me.set('language', 'ru')
 //      name: 'com.m.lang',
 //      value: 'ru'
 //    }],
-//    language: 'ru'
+//    association: {
+//      flags: {
+//        'com.m.administrator': 'true'
+//      }
+//    } 
 //  }
 ```

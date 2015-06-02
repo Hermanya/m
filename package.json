@@ -1,5 +1,5 @@
 {
-  "name": "m",
+  "name": "hermanjs",
   "version": "1.0.0",
   "description": "Singleton models with Backbone and possibly other frameworks",
   "main": "dist/backbone-m.js",

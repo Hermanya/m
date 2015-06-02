@@ -1,0 +1,17 @@
+{
+  "name": "hermanjs",
+  "version": "0.0.2",
+  "homepage": "https://github.com/Hermanya/m",
+  "authors": [
+    "Herman Starikov <herman.starikov@uxpsystems.com>"
+  ],
+  "main": "dist/backbone-m.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

@@ -10,6 +10,9 @@
           _attributeMappings: {
             language: 'com.m.lang',
             age: 'com.m.age'
+          },
+          _shortcutMappings: {
+            isAdmin: ['association', 'flags', 'com.m.write']
           }
         },
         group: 'any',
@@ -27,7 +30,12 @@
         attributes: [{
           name: 'com.m.age',
           value: '12'
-        }]
+        }],
+        association: {
+          flags: {
+            'com.m.write': 'true'
+          }
+        }
       });
 
       myHousehold = m.group(1).users().collection();
@@ -79,6 +87,15 @@
       expect(me.get('age')).toEqual(12)
       me.set('age', me.get('age') + 3)
       expect(me.get('age')).toEqual(15)
+    });
+
+    it('get shortcut', function () {
+      expect(me.get('isAdmin')).toEqual(true)
+      me.set('isAdmin', false)
+      expect(me.get('isAdmin')).toEqual(false)
+      me.set('isAdmin', 99)
+      expect(me.attributes.isAdmin).toEqual(undefined)
+      expect(me.attributes.association.flags['com.m.write']).toEqual('99')
     });
 
   });

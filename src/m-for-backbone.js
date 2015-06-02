@@ -102,6 +102,19 @@
             }
             return value;
           }
+
+          var _shortcutMappings = m.api.resources[resourceType]._shortcutMappings;
+          if (_shortcutMappings && _shortcutMappings[key]) {
+            var value = _shortcutMappings[key].reduce(function(obj, key) {
+              return obj[key];
+            }, this.attributes);
+              try {
+                return JSON.parse(value);
+              } catch (_) {
+                return value;
+              }
+          }
+
           return Backbone.Model.prototype.get.call(this, key);
         },
         set: function(key, val, options) {
@@ -147,6 +160,28 @@
             }.bind(this));
           }
 
+
+
+          var _shortcutMappings = m.api.resources[resourceType]._shortcutMappings;
+          if (_shortcutMappings && _shortcutMappings[key]) {
+            attrs = Object.keys(attrs).reduce(function(result, key) {
+              if (_shortcutMappings[key]) {
+                _shortcutMappings[key].reduce(function(parent, child, index) {
+                  if (index === _shortcutMappings[key].length - 1) {
+                    var value = attrs[key];
+                    if (typeof value !== 'string') {
+                      value = JSON.stringify(value)
+                    }
+                    parent[child] = value;
+                  }
+                  return parent[child];
+                }.bind(this), this.attributes);
+              } else {
+                result[key] = attrs[key]
+              }
+              return result;
+            }.bind(this), {})
+          }
 
 
       	  if (attrs.id && attrs.id !== this.get('id')) {
