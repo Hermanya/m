@@ -98,4 +98,11 @@
       expect(me.attributes.association.flags['com.m.write']).toEqual('99')
     });
 
+    it('get shortcut', function () {
+      var jim = m.user(3).model();
+      expect(jim.attributes.association).toEqual(undefined);
+      jim.set('isAdmin', true);
+      expect(jim.attributes.association.flags['com.m.write']).toEqual('true');
+    });
+
   });

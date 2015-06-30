@@ -41,8 +41,8 @@
             return 'an error';
           }
         },
-        saveOwnAttributes: function () {
-          var ownAttributes = Object.keys(this.attributes).reduce(function (attributes, key) {
+        saveOwnAttributes: function (attributes) {
+          var ownAttributes = attributes || Object.keys(this.attributes).reduce(function (attributes, key) {
             if (['displayName'].indexOf(key) !== -1) {
               attributes[key] = this.attributes[key];
             }
@@ -63,7 +63,7 @@
             data: JSON.stringify(this.get('attributes'))
           });
         },
-        save: function () {
+        saveEverything: function () {
           return Backbone.$.when(
             this.saveOwnAttributes(),
             this.saveCustomAttributes()
@@ -173,8 +173,12 @@
                       value = JSON.stringify(value)
                     }
                     parent[child] = value;
+                  } else {
+                    if (parent[child] === undefined) {
+                      parent[child] = {};
+                    }
+                    return parent[child];
                   }
-                  return parent[child];
                 }.bind(this), this.attributes);
               } else {
                 result[key] = attrs[key]
