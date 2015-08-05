@@ -1,6 +1,11 @@
 Request for Comments
 ----
 
+This project solves problems of
+- boilerplate
+- synchronisation and singleton management
+- schema mappings
+
 ###Features
 
 - models with defined ids are singletons
