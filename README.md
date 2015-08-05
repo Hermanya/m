@@ -32,7 +32,7 @@ define(['m-for-backbone'], function (m) {
         _attributeMappings: {
           language: 'com.m.lang'
         },
-        _shortcutMappgins: {
+        _shortcutMappings: {
           isAdmin: ['association', 'flags', 'com.m.administrator']
         }
       }
@@ -69,6 +69,6 @@ me.set('isAdmin', true)
 //      flags: {
 //        'com.m.administrator': 'true'
 //      }
-//    } 
+//    }
 //  }
 ```
