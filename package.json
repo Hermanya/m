@@ -30,7 +30,11 @@
     "url": "https://github.com/Hermanya/m.git"
   },
   "keywords": [
+    "manage",
+    "generate",
     "model",
+    "management",
+    "orm",
     "backbone",
     "singleton"
   ],

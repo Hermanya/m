@@ -33,7 +33,6 @@ function decorateWithSingularFormMethods (resource, m) {
     state.resourceType = resource;
 
     function appendId (id) {
-      state.id = id;
       state.urlFragments.push(id);
     }
 

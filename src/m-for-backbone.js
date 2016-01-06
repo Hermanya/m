@@ -41,13 +41,8 @@
             return 'an error';
           }
         },
-        saveOwnAttributes: function (attributes) {
-          var ownAttributes = attributes || Object.keys(this.attributes).reduce(function (attributes, key) {
-            if (['displayName'].indexOf(key) !== -1) {
-              attributes[key] = this.attributes[key];
-            }
-            return attributes;
-          }.bind(this), {});
+        saveProperties: function (attributes) {
+          var ownAttributes = attributes || this.attributes;
           return Backbone.ajax({
             type: 'PUT',
             url: this.url(),
@@ -56,16 +51,20 @@
           });
         },
         saveCustomAttributes: function () {
+          var url = this.url();
+          if (!/\d/.test(url.slice(-1))) {
+            url += '/' + this.id;
+          }
           return Backbone.ajax({
             type: 'POST',
-            url: this.url() + '/attributes',
+            url: url + '/attributes',
             contentType: "application/json;charset=utf-8",
             data: JSON.stringify(this.get('attributes'))
           });
         },
         saveEverything: function () {
           return Backbone.$.when(
-            this.saveOwnAttributes(),
+            this.saveProperties(),
             this.saveCustomAttributes()
           );
         },
@@ -89,9 +88,9 @@
 
           var _attributeMappings = m.api.resources[resourceType]._attributeMappings;
           if (_attributeMappings && _attributeMappings[key]) {
-            var attribute = this.get('attributes').filter(function (attr) {
+            var attribute = this.get('attributes') && this.get('attributes').filter(function (attr) {
               return attr.name === _attributeMappings[key];
-            })[0]
+            })[0];
             var value;
             if (attribute) {
               try {
@@ -131,7 +130,9 @@
           }
           options = options || {};
 
-
+          if (attrs.cid) {
+            attrs = attrs.attributes || {};
+          }
 
           var _attributeMappings = m.api.resources[resourceType]._attributeMappings;
           if (_attributeMappings) {
@@ -139,7 +140,7 @@
               var attributeName = _attributeMappings[attributeMapping];
               if (attrs[attributeMapping] !== undefined) {
                 if (!this.has('attributes')) {
-                  this.set('attributes', [], {silent: true})
+                  this.set('attributes', [], {silent: true});
                 }
                 var attributes = this.get('attributes').filter(function (attribute) {
                   return attribute.name !== attributeName;
@@ -147,13 +148,14 @@
 
                 var value = attrs[attributeMapping];
                 if (typeof value !== 'string') {
-                  value = JSON.stringify(value)
+                  value = JSON.stringify(value);
                 }
                 attributes.push({
                   name: attributeName,
-                  value: value
+                  value: value,
+                  scope: options.scope
                 });
-                delete attrs[attributeMapping]
+                delete attrs[attributeMapping];
 
                 this.set('attributes', attributes);
               }
@@ -170,7 +172,7 @@
                   if (index === _shortcutMappings[key].length - 1) {
                     var value = attrs[key];
                     if (typeof value !== 'string') {
-                      value = JSON.stringify(value)
+                      value = JSON.stringify(value);
                     }
                     parent[child] = value;
                   } else {
@@ -181,10 +183,10 @@
                   }
                 }.bind(this), this.attributes);
               } else {
-                result[key] = attrs[key]
+                result[key] = attrs[key];
               }
               return result;
-            }.bind(this), {})
+            }.bind(this), {});
           }
 
 
@@ -214,12 +216,16 @@
   }
 
   function createModel (m) {
+    var id = Number(m.urlFragments.slice(-1)[0]);
+    if (isNaN(id)) {
+      id = undefined;
+    }
     m.cache[m.url] = new modelConstructorsPerType[m.resourceType]({
-      id: m.id
+      id: id
     });
     m.cache[m.url].url = function () {
       return m.url;
-    }
+    };
     return m.cache[m.url];
   }
 
@@ -242,6 +248,7 @@
           return model;
         } else {
           model = new modelConstructorsPerType[m.resourceType](attributes);
+          model.urlRoot = m.api.prefix + '/' + m.resourceType;
           m.cache[key] = model;
           return model;
         }

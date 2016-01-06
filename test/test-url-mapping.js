@@ -45,4 +45,20 @@
     it ('maps limited number of groups related to user with certain id', function () {
       expect(m.user(2).groups(query).url()).toEqual(api.prefix + '/user/2/groups/?limit=2&offset=4');
     });
+
+    it ('maps proper ids ', function () {
+      var association = m.user(2).account(1).association().model();
+      expect(association.get('id')).toEqual(undefined);
+      var account = m.account(34).model();
+      expect(account.get('id')).toEqual(34);
+    });
+
+    it ('maps user accounts properly ', function () {
+      var accounts = m.user(2).accounts().collection();
+      accounts.push({
+        name: 'test account',
+        id: 34
+      });
+      expect(accounts.at(0).url()).toEqual(api.prefix + '/account/34');
+    });
   });
