@@ -224,6 +224,9 @@
       id: id
     });
     m.cache[m.url].url = function () {
+      if (this.id && this.urlRoot) {
+        return this.urlRoot + '/' + this.id
+      }
       return m.url;
     };
     return m.cache[m.url];
@@ -245,6 +248,7 @@
         }
         if (model) {
           model.set(attributes);
+          model.urlRoot = m.api.prefix + '/' + m.resourceType;
           return model;
         } else {
           model = new modelConstructorsPerType[m.resourceType](attributes);

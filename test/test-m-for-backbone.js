@@ -105,4 +105,9 @@
       expect(jim.attributes.association.flags['com.m.write']).toEqual('true');
     });
 
+    it('get shortcut', function () {
+      expect(myHousehold.at(0).id).toEqual(1);
+      expect(myHousehold.at(0).url()).toEqual(api.prefix + '/user/1');
+    });
+
   });
