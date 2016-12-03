@@ -1,6 +1,6 @@
 {
   "name": "hermanjs",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Singleton models with Backbone and possibly other frameworks",
   "main": "dist/backbone-m.js",
   "directories": {
