@@ -73,7 +73,7 @@
           otherModel.modelsTiedWith.forEach(function (indirectModel) {
             this.modelsTiedWith.push(indirectModel);
             indirectModel.modelsTiedWith.push(this);
-          });
+          }.bind(this));
           this.modelsTiedWith.push(otherModel);
           otherModel.modelsTiedWith.push(this);
         },
